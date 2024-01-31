@@ -1,8 +1,17 @@
+import { useQuery } from '@tanstack/react-query'
 import { DollarSign } from 'lucide-react'
 
+import { getMonthCanceledOrdersAmount } from '@/api/get-month-canceled-orders-amount'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+import { MetricCardSkeleton } from './metric-card-skeleton'
+
 export function MouthCanceledOrdersAmountCard() {
+  const { data: mouthCanceledOrdersAmount } = useQuery({
+    queryFn: getMonthCanceledOrdersAmount,
+    queryKey: ['metrics', 'month-canceled-orders-amount'],
+  })
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
@@ -13,11 +22,32 @@ export function MouthCanceledOrdersAmountCard() {
       </CardHeader>
 
       <CardContent className="space-y-1">
-        <span className="text-2xl font-bold tracking-tight"> 5 </span>
-        <p className="text-xs text-muted-foreground">
-          <span className="text-emerald-500 dark:text-emerald-400">-2%</span> em
-          relação ao mês anterior
-        </p>
+        {mouthCanceledOrdersAmount ? (
+          <>
+            <span className="text-2xl font-bold tracking-tight">
+              {mouthCanceledOrdersAmount.amount.toLocaleString('pt-BR')}
+            </span>
+            <p className="text-xs text-muted-foreground">
+              {mouthCanceledOrdersAmount.diffFromLastMonth < 0 ? (
+                <>
+                  <span className="text-emerald-500 dark:text-emerald-400">
+                    {mouthCanceledOrdersAmount.diffFromLastMonth}%
+                  </span>{' '}
+                  em relação ao mês passado
+                </>
+              ) : (
+                <>
+                  <span className="text-rose-500 dark:text-rose-400">
+                    + {mouthCanceledOrdersAmount.diffFromLastMonth}%
+                  </span>{' '}
+                  em relação ao mês passado
+                </>
+              )}
+            </p>
+          </>
+        ) : (
+          <MetricCardSkeleton />
+        )}
       </CardContent>
     </Card>
   )
