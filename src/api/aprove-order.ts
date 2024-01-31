@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios'
 
-interface AproveOrderParams {
+export interface AproveOrderParams {
   orderId: string
 }
 
